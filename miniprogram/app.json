@@ -1,12 +1,14 @@
 {
   "pages": [
+    "pages/chat/chat",
     "pages/index/index",
     "pages/logs/logs"
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "Weixin",
-    "navigationBarBackgroundColor": "#ffffff"
+    "navigationBarTitleText": "ChatKit",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationStyle": "custom"
   },
   "style": "v2",
   "componentFramework": "glass-easel",

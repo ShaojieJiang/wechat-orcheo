@@ -1,0 +1,91 @@
+<!--chat.wxml-->
+<view class="chat-container">
+  <!-- Header -->
+  <view class="chat-header">
+    <view class="header-title">ChatKit</view>
+    <view class="header-actions">
+      <view class="clear-btn" bindtap="clearChat">
+        <text class="clear-icon">+</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Messages Area -->
+  <scroll-view
+    class="messages-area"
+    scroll-y
+    scroll-into-view="{{scrollToView}}"
+    scroll-with-animation
+    enhanced
+    show-scrollbar="{{false}}"
+  >
+    <view class="messages-wrapper">
+      <block wx:for="{{messages}}" wx:key="id">
+        <view
+          id="msg-{{item.id}}"
+          class="message-row {{item.role === 'user' ? 'user-row' : 'assistant-row'}}"
+        >
+          <view class="message-bubble {{item.role === 'user' ? 'user-bubble' : 'assistant-bubble'}}">
+            <view wx:if="{{item.role === 'assistant'}}" class="avatar assistant-avatar">
+              <text class="avatar-icon">AI</text>
+            </view>
+            <view class="message-content">
+              <text class="message-text">{{item.content}}</text>
+            </view>
+            <view wx:if="{{item.role === 'user'}}" class="avatar user-avatar">
+              <text class="avatar-icon">U</text>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- Loading indicator -->
+      <view wx:if="{{isLoading}}" class="message-row assistant-row">
+        <view class="message-bubble assistant-bubble">
+          <view class="avatar assistant-avatar">
+            <text class="avatar-icon">AI</text>
+          </view>
+          <view class="message-content loading-content">
+            <view class="typing-indicator">
+              <view class="typing-dot"></view>
+              <view class="typing-dot"></view>
+              <view class="typing-dot"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Bottom padding for scroll -->
+      <view class="scroll-padding"></view>
+    </view>
+  </scroll-view>
+
+  <!-- Input Area -->
+  <view class="input-area">
+    <view class="input-wrapper">
+      <input
+        class="message-input"
+        type="text"
+        placeholder="Message ChatKit..."
+        placeholder-class="placeholder-text"
+        value="{{inputValue}}"
+        bindinput="onInputChange"
+        bindconfirm="onConfirm"
+        confirm-type="send"
+        adjust-position="{{true}}"
+        cursor-spacing="20"
+      />
+      <view
+        class="send-btn {{inputValue.length > 0 && !isLoading ? 'send-btn-active' : ''}}"
+        bindtap="onSendMessage"
+      >
+        <view class="send-icon">
+          <text class="arrow-up">↑</text>
+        </view>
+      </view>
+    </view>
+    <view class="input-footer">
+      <text class="footer-text">Powered by ChatKit</text>
+    </view>
+  </view>
+</view>
