@@ -22,12 +22,25 @@ Component({
     scrollToView: '',
     threadId: '' as string,
     assistantMessage: '' as string, // For streaming response
+    statusBarHeight: 0, // Height of status bar for safe area
+    headerRightPadding: 0, // Right padding to avoid capsule button
+    inputFocus: true, // Control input focus to keep keyboard visible
+    keyboardHeight: 0, // Track keyboard height for manual positioning
   },
 
   lifetimes: {
     attached() {
-      // Add welcome message
-      this.addMessage('assistant', 'Hello! How can I help you today?');
+      // Get system info for status bar height
+      const systemInfo = wx.getSystemInfoSync();
+      // Get menu button (capsule) position to avoid overlap
+      const menuButtonInfo = wx.getMenuButtonBoundingClientRect();
+
+      this.setData({
+        statusBarHeight: systemInfo.statusBarHeight || 44,
+        // Right padding to avoid the capsule button
+        headerRightPadding: systemInfo.windowWidth - menuButtonInfo.left + 10,
+      });
+
     },
   },
 
@@ -75,6 +88,16 @@ Component({
       });
     },
 
+    // Handle tap on messages area to hide keyboard
+    onMessagesAreaTap() {
+      this.setData({ inputFocus: false });
+    },
+
+    // Handle keyboard height change
+    onKeyboardHeightChange(e: WechatMiniprogram.InputKeyboardHeightChange) {
+      this.setData({ keyboardHeight: e.detail.height });
+    },
+
     // Handle send message
     onSendMessage() {
       const content = this.data.inputValue.trim();
@@ -83,10 +106,11 @@ Component({
       // Add user message
       this.addMessage('user', content);
 
-      // Clear input
+      // Clear input while keeping keyboard visible
       this.setData({
         inputValue: '',
         isLoading: true,
+        inputFocus: true,
       });
 
       // Send to Orcheo API
@@ -291,15 +315,14 @@ Component({
     // Clear chat history
     clearChat() {
       wx.showModal({
-        title: 'Clear Chat',
-        content: 'Are you sure you want to clear all messages?',
+        title: '清空对话',
+        content: '确定要清空所有消息吗？',
         success: (res) => {
           if (res.confirm) {
             this.setData({
               messages: [],
               threadId: '', // Reset thread for new conversation
             });
-            this.addMessage('assistant', 'Chat cleared. How can I help you?');
           }
         },
       });

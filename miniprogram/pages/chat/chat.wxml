@@ -1,11 +1,14 @@
 <!--chat.wxml-->
 <view class="chat-container">
+  <!-- Status bar spacer -->
+  <view class="status-bar-spacer" style="height: {{statusBarHeight}}px;"></view>
+
   <!-- Header -->
-  <view class="chat-header">
-    <view class="header-title">ChatKit</view>
+  <view class="chat-header" style="padding-right: {{headerRightPadding}}px;">
+    <view class="header-title">Orcheo</view>
     <view class="header-actions">
       <view class="clear-btn" bindtap="clearChat">
-        <text class="clear-icon">+</text>
+        <text class="clear-text">清空对话</text>
       </view>
     </view>
   </view>
@@ -18,6 +21,7 @@
     scroll-with-animation
     enhanced
     show-scrollbar="{{false}}"
+    bindtap="onMessagesAreaTap"
   >
     <view class="messages-wrapper">
       <block wx:for="{{messages}}" wx:key="id">
@@ -27,33 +31,29 @@
         >
           <view class="message-bubble {{item.role === 'user' ? 'user-bubble' : 'assistant-bubble'}}">
             <view wx:if="{{item.role === 'assistant'}}" class="avatar assistant-avatar">
-              <text class="avatar-icon">AI</text>
+              <image class="avatar-image" src="/images/orcheo.svg" mode="aspectFill"></image>
             </view>
-            <view class="message-content">
-              <text class="message-text">{{item.content}}</text>
+            <view class="message-content {{item.role === 'assistant' && !item.content && isLoading ? 'loading-content' : ''}}">
+              <block wx:if="{{item.role === 'assistant' && !item.content && isLoading}}">
+                <view class="typing-indicator">
+                  <view class="typing-dot"></view>
+                  <view class="typing-dot"></view>
+                  <view class="typing-dot"></view>
+                </view>
+              </block>
+              <block wx:else>
+                <text class="message-text">{{item.content}}</text>
+              </block>
             </view>
             <view wx:if="{{item.role === 'user'}}" class="avatar user-avatar">
-              <text class="avatar-icon">U</text>
+              <view class="user-icon">
+                <view class="user-icon-head"></view>
+                <view class="user-icon-body"></view>
+              </view>
             </view>
           </view>
         </view>
       </block>
-
-      <!-- Loading indicator -->
-      <view wx:if="{{isLoading}}" class="message-row assistant-row">
-        <view class="message-bubble assistant-bubble">
-          <view class="avatar assistant-avatar">
-            <text class="avatar-icon">AI</text>
-          </view>
-          <view class="message-content loading-content">
-            <view class="typing-indicator">
-              <view class="typing-dot"></view>
-              <view class="typing-dot"></view>
-              <view class="typing-dot"></view>
-            </view>
-          </view>
-        </view>
-      </view>
 
       <!-- Bottom padding for scroll -->
       <view class="scroll-padding"></view>
@@ -61,31 +61,34 @@
   </scroll-view>
 
   <!-- Input Area -->
-  <view class="input-area">
+  <view class="input-area" style="margin-bottom: {{keyboardHeight}}px;">
     <view class="input-wrapper">
       <input
         class="message-input"
         type="text"
-        placeholder="Message ChatKit..."
+        placeholder="给 Orcheo 发消息..."
         placeholder-class="placeholder-text"
         value="{{inputValue}}"
         bindinput="onInputChange"
         bindconfirm="onConfirm"
         confirm-type="send"
-        adjust-position="{{true}}"
+        adjust-position="{{false}}"
         cursor-spacing="20"
+        hold-keyboard="{{true}}"
+        focus="{{inputFocus}}"
+        bindkeyboardheightchange="onKeyboardHeightChange"
       />
       <view
         class="send-btn {{inputValue.length > 0 && !isLoading ? 'send-btn-active' : ''}}"
-        bindtap="onSendMessage"
+        catchtouchend="onSendMessage"
       >
         <view class="send-icon">
           <text class="arrow-up">↑</text>
         </view>
       </view>
     </view>
-    <view class="input-footer">
-      <text class="footer-text">Powered by ChatKit</text>
+    <view class="input-footer" wx:if="{{keyboardHeight === 0}}">
+      <text class="footer-text">Powered by Orcheo</text>
     </view>
   </view>
 </view>
